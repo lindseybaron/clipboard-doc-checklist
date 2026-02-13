@@ -1,4 +1,4 @@
-const DOC_ID = '<REPLACE_WITH_DOC_ID>';
+const DOC_ID = '<YOUR_DOC_ID>';
 const ALLOW_PLAIN_FALLBACK = false;
 const DEFAULT_TIMEZONE = ''; // Optional IANA timezone, e.g. 'America/Los_Angeles'
 
