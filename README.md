@@ -78,6 +78,7 @@ If a heading is missing, the script creates it automatically as H1.
 
 Notes:
 - Endpoint expects JSON via POST body.
+- `section` is required in the POST body (the Python watcher sends this from `config.json` `tag_map`).
 - Success response is plain text `OK`.
 
 ### 3) Configure local watcher

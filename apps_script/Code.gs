@@ -1,13 +1,6 @@
 const DOC_ID = '<REPLACE_WITH_DOC_ID>';
 const ALLOW_PLAIN_FALLBACK = false;
 
-const TAG_TO_SECTION = {
-  todo: 'TODO',
-  next: 'Next Actions',
-  idea: 'Ideas',
-  misc: 'Miscellany',
-};
-
 function doPost(e) {
   try {
     if (!e || !e.postData || !e.postData.contents) {
@@ -29,11 +22,14 @@ function doPost(e) {
     if (!type || String(type).trim() === '') {
       throw new Error('Missing required field: type');
     }
+    if (!section || String(section).trim() === '') {
+      throw new Error('Missing required field: section');
+    }
     if (!text || String(text).trim() === '') {
       throw new Error('Missing required field: text');
     }
 
-    appendEntry(type, text, who, section);
+    appendEntry(text, who, section);
     return ContentService.createTextOutput('OK').setMimeType(ContentService.MimeType.TEXT);
   } catch (err) {
     return ContentService.createTextOutput('Error: ' + err.message).setMimeType(ContentService.MimeType.TEXT);
@@ -69,9 +65,8 @@ function ensureSections(sectionsRaw) {
   doc.saveAndClose();
 }
 
-function appendEntry(typeRaw, textRaw, who, sectionRaw) {
-  var type = normalizeType_(typeRaw);
-  var sectionTitle = resolveSectionTitle_(type, sectionRaw);
+function appendEntry(textRaw, who, sectionRaw) {
+  var sectionTitle = resolveSectionTitle_(sectionRaw);
   var text = String(textRaw || '').trim();
   if (!text) {
     throw new Error('text is empty after trimming');
@@ -112,20 +107,12 @@ function appendEntry(typeRaw, textRaw, who, sectionRaw) {
   doc.saveAndClose();
 }
 
-function resolveSectionTitle_(type, sectionRaw) {
+function resolveSectionTitle_(sectionRaw) {
   var section = String(sectionRaw || '').trim();
-  if (section) {
-    return section;
+  if (!section) {
+    throw new Error('section is empty after trimming');
   }
-  return TAG_TO_SECTION[type] || TAG_TO_SECTION.misc;
-}
-
-function normalizeType_(typeRaw) {
-  var t = String(typeRaw || '').trim().toLowerCase();
-  if (t.endsWith(':')) {
-    t = t.slice(0, -1);
-  }
-  return t;
+  return section;
 }
 
 function findOrCreateH1Section_(body, sectionTitle) {
