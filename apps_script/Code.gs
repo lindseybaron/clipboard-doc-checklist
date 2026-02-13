@@ -71,7 +71,7 @@ function appendEntry(textRaw, who, sectionRaw) {
     throw new Error('text is empty after trimming');
   }
 
-  var whoSafe = String(who || 'LB').trim() || 'LB';
+  var whoSafe = String(who || 'ME').trim() || 'ME';
   var timestamp = formatNow_();
   var line = '- ' + timestamp + ' [' + whoSafe + ']: ' + text;
 

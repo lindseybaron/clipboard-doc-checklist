@@ -40,7 +40,7 @@ def load_config(config_path: Path) -> dict[str, Any]:
     if not web_app_url:
         raise ValueError("config.json is missing required field: web_app_url")
 
-    who = str(cfg.get("who", "LB")).strip() or "LB"
+    who = str(cfg.get("who", "ME")).strip() or "ME"
     poll_interval = float(cfg.get("poll_interval", 0.5))
     unknown_behavior = str(cfg.get("unknown_prefix_behavior", "map_to_misc")).strip().lower()
     if unknown_behavior not in {"map_to_misc", "ignore"}:
