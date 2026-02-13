@@ -2,8 +2,10 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-LABEL="com.clipboard-doc-checklist.watcher"
+LABEL="com.clipto.watcher"
+OLD_LABEL="com.clipboard-doc-checklist.watcher"
 PLIST_PATH="$HOME/Library/LaunchAgents/$LABEL.plist"
+OLD_PLIST_PATH="$HOME/Library/LaunchAgents/$OLD_LABEL.plist"
 PYTHON_BIN="$ROOT_DIR/.venv/bin/python"
 WATCHER_SCRIPT="$ROOT_DIR/tools/todo_it_clipboard.py"
 LOG_DIR="$ROOT_DIR/logs"
@@ -53,8 +55,14 @@ cat >"$PLIST_PATH" <<EOF
 EOF
 
 # Remove previously loaded job if present (ignore failures).
+launchctl bootout "gui/$UID/$OLD_LABEL" >/dev/null 2>&1 || true
+launchctl bootout "gui/$UID" "$OLD_PLIST_PATH" >/dev/null 2>&1 || true
 launchctl bootout "gui/$UID/$LABEL" >/dev/null 2>&1 || true
 launchctl bootout "gui/$UID" "$PLIST_PATH" >/dev/null 2>&1 || true
+
+if [[ -f "$OLD_PLIST_PATH" ]]; then
+  rm -f "$OLD_PLIST_PATH"
+fi
 
 launchctl bootstrap "gui/$UID" "$PLIST_PATH"
 launchctl enable "gui/$UID/$LABEL" >/dev/null 2>&1 || true

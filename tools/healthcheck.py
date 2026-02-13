@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run quick health checks for clipboard-doc-checklist setup."""
+"""Run quick health checks for Clipto setup."""
 
 from __future__ import annotations
 

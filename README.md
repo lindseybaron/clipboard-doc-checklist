@@ -1,4 +1,4 @@
-# Clipboard -> Google Doc Checklist
+# Clipto
 
 Small automation project for capturing clipboard lines like `todo: ...` or `next: ...` and appending them into a Google Doc under configurable H1 sections, newest first.
 
@@ -129,7 +129,7 @@ bash scripts/install_launchagent.sh
 Check status:
 
 ```bash
-launchctl print "gui/$(id -u)/com.clipboard-doc-checklist.watcher" | sed -n '1,40p'
+launchctl print "gui/$(id -u)/com.clipto.watcher" | sed -n '1,40p'
 ```
 
 Stop and remove:
