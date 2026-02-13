@@ -15,10 +15,16 @@ function doPost(e) {
     }
 
     var payload = JSON.parse(e.postData.contents);
+    var action = payload && payload.action;
     var type = payload && payload.type;
     var section = payload && payload.section;
     var text = payload && payload.text;
     var who = payload && payload.who;
+
+    if (String(action || '').trim().toLowerCase() === 'ensure_sections') {
+      ensureSections(payload && payload.sections);
+      return ContentService.createTextOutput('OK').setMimeType(ContentService.MimeType.TEXT);
+    }
 
     if (!type || String(type).trim() === '') {
       throw new Error('Missing required field: type');
@@ -32,6 +38,34 @@ function doPost(e) {
   } catch (err) {
     return ContentService.createTextOutput('Error: ' + err.message).setMimeType(ContentService.MimeType.TEXT);
   }
+}
+
+function ensureSections(sectionsRaw) {
+  if (!Array.isArray(sectionsRaw) || sectionsRaw.length === 0) {
+    throw new Error('Missing required field: sections (non-empty array)');
+  }
+
+  var seen = {};
+  var sections = [];
+  for (var i = 0; i < sectionsRaw.length; i++) {
+    var section = String(sectionsRaw[i] || '').trim();
+    if (!section || seen[section]) {
+      continue;
+    }
+    seen[section] = true;
+    sections.push(section);
+  }
+
+  if (sections.length === 0) {
+    throw new Error('sections array had no valid section titles');
+  }
+
+  var doc = DocumentApp.openById(DOC_ID);
+  var body = doc.getBody();
+  for (var j = 0; j < sections.length; j++) {
+    findOrCreateH1Section_(body, sections[j]);
+  }
+  doc.saveAndClose();
 }
 
 function appendEntry(typeRaw, textRaw, who, sectionRaw) {
