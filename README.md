@@ -7,6 +7,7 @@ Small automation project for capturing clipboard lines like `todo: ...` or `next
 - `apps_script/Code.gs`: Google Apps Script Web App (`doPost`) that writes to your Google Doc.
 - `tools/todo_it_clipboard.py`: Python clipboard watcher that POSTs matching lines.
 - `config.example.json`: user-specific config template.
+- `scripts/install.sh`: one-command install + config validation + optional launchd setup.
 - `scripts/bootstrap.sh`: one-command local setup (venv + deps + config scaffold).
 - `scripts/install_launchagent.sh`: install/start macOS login auto-run via launchd.
 - `scripts/uninstall_launchagent.sh`: remove/stop the launchd auto-run job.
@@ -28,10 +29,17 @@ Case-insensitive tags map to the exact Doc section headings as defined in `confi
 From the repo root:
 
 ```bash
-bash scripts/bootstrap.sh
+bash scripts/install.sh
 ```
 
-Then edit `config.json` and run:
+This command will:
+
+- bootstrap your Python environment
+- create `config.json` if missing
+- validate required config fields
+- optionally install launchd startup
+
+Then run manually (if you skipped launchd):
 
 ```bash
 source .venv/bin/activate
