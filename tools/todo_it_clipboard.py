@@ -141,7 +141,12 @@ def main() -> int:
     if config["google_doc_url"]:
         print(f"[info] target doc: {config['google_doc_url']}")
 
-    last_clipboard = None
+    # Prime baseline clipboard state so startup content is not posted.
+    try:
+        last_clipboard = pyperclip.paste()
+    except Exception:
+        last_clipboard = None
+
     while True:
         try:
             current = pyperclip.paste()
