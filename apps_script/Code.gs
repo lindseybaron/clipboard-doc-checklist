@@ -1,5 +1,6 @@
 const DOC_ID = '<REPLACE_WITH_DOC_ID>';
 const ALLOW_PLAIN_FALLBACK = false;
+const DEFAULT_TIMEZONE = ''; // Optional IANA timezone, e.g. 'America/Los_Angeles'
 
 function doPost(e) {
   try {
@@ -333,10 +334,22 @@ function createSectionAndFirstChecklistItemWithDocsApi_(sectionTitle, line, inse
 
 function formatNow_() {
   var fallbackTz = Session.getScriptTimeZone();
-  var preferredTz = 'America/Los_Angeles';
+  var preferredTz = resolveTimezone_(fallbackTz);
   try {
     return Utilities.formatDate(new Date(), preferredTz, 'yyyy-MM-dd HH:mm');
   } catch (err) {
     return Utilities.formatDate(new Date(), fallbackTz, 'yyyy-MM-dd HH:mm');
   }
+}
+
+function resolveTimezone_(fallbackTz) {
+  var scriptTz = '';
+  try {
+    scriptTz = PropertiesService.getScriptProperties().getProperty('CLIPTO_TIMEZONE') || '';
+  } catch (err) {
+    scriptTz = '';
+  }
+
+  var configuredTz = String(scriptTz || DEFAULT_TIMEZONE || '').trim();
+  return configuredTz || fallbackTz;
 }
