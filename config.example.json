@@ -4,6 +4,16 @@
   "who": "ME",
   "poll_interval": 0.5,
   "unknown_prefix_behavior": "map_to_misc",
+  "auth_mode": "none",
+  "oauth": {
+    "client_secrets_file": "oauth_client_secret.json",
+    "token_file": ".secrets/oauth_token.json",
+    "scopes": [
+      "openid",
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile"
+    ]
+  },
   "tag_map": {
     "todo": "TODO",
     "next": "Next Actions",

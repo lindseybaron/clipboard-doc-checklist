@@ -51,7 +51,9 @@ If a heading is missing, the script creates it automatically as H1.
 4. Save.
 5. Deploy -> New deployment -> Web app:
    - **Execute as**: `Me`
-   - **Who has access**: `Anyone in domain` (preferred) or `Anyone with the link`
+   - **Who has access**:
+     - `Anyone` for no-auth local client mode, or
+     - `Anyone within your domain` / `Anyone with Google account` when using OAuth in the watcher
 6. Copy the `/exec` URL.
 
 Notes:
@@ -73,11 +75,23 @@ Edit `config.json`:
 - `who`: initials/name to stamp in each entry (template default `ME`)
 - `poll_interval`: clipboard polling interval in seconds (default `0.5`)
 - `unknown_prefix_behavior`: `map_to_misc` or `ignore` (default `map_to_misc`)
+- `auth_mode`: `none` or `oauth_user`
+- `oauth`: OAuth client and token settings (used when `auth_mode` is `oauth_user`)
 - `tag_map`: your tags and their target section headings (case-insensitive tags)
 
 Example:
 
 ```json
+"auth_mode": "none",
+"oauth": {
+  "client_secrets_file": "oauth_client_secret.json",
+  "token_file": ".secrets/oauth_token.json",
+  "scopes": [
+    "openid",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+  ]
+},
 "tag_map": {
   "todo": "TODO",
   "next": "Next Actions",
@@ -85,6 +99,19 @@ Example:
   "misc": "Miscellany"
 }
 ```
+
+### 3b) Optional: enable authenticated posting (`auth_mode: oauth_user`)
+
+Use this when your Apps Script is not public (`Anyone within your domain` or `Anyone with Google account`).
+
+1. In Google Cloud Console, create an OAuth Client ID of type **Desktop app**.
+2. Download the client JSON and place it in repo root as `oauth_client_secret.json` (or update path in config).
+3. Set in `config.json`:
+   - `"auth_mode": "oauth_user"`
+4. Start watcher normally:
+   - `python tools/todo_it_clipboard.py`
+5. On first send, a browser login/consent flow appears; complete it with an allowed account.
+6. Token is stored at `.secrets/oauth_token.json` for refresh/reuse.
 
 ### 4) Install and run
 
@@ -120,7 +147,9 @@ Expected item text format:
   - verify the intended tag exists in `config.json` `tag_map`
   - redeploy and ensure you are using latest `/exec` URL
 - Permission errors:
-  - review deployment access (`Anyone in domain` vs `Anyone with the link`)
+  - if deployment is restricted, set `auth_mode` to `oauth_user`
+  - confirm `oauth_client_secret.json` exists and first-run auth completed
+  - ensure the signed-in OAuth account is allowed by deployment access policy
 - Checkbox glyph not present:
   - script tries `DocumentApp.GlyphType.CHECKBOX`
   - if not supported, it falls back to plain paragraph starting with `[ ] `
@@ -129,7 +158,8 @@ Expected item text format:
 
 - Text is sent over HTTPS POST to your Apps Script endpoint.
 - Clipboard content is not put into URL query strings.
-- Anyone with your `/exec` URL may be able to POST; prefer domain-restricted deployment when possible.
+- In `auth_mode: none`, endpoint access relies on web app sharing settings.
+- In `auth_mode: oauth_user`, requests include `Authorization: Bearer <Google access token>`.
 
 ## License
 

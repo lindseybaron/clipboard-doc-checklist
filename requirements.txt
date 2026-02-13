@@ -1,1 +1,4 @@
 pyperclip
+google-auth
+google-auth-oauthlib
+requests

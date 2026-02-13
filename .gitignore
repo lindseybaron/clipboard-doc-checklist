@@ -1,5 +1,8 @@
 # Local user config with private URLs and identity.
 config.json
+oauth_client_secret*.json
+client_secret*.json
+.secrets/
 
 # Python cache / virtual env artifacts.
 __pycache__/
