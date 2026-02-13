@@ -11,6 +11,7 @@ Small automation project for capturing clipboard lines like `todo: ...` or `next
 - `config.example.json`: user-specific config template.
 - `scripts/install.sh`: one-command install + config validation + optional launchd setup.
 - `scripts/bootstrap.sh`: one-command local setup (venv + deps + config scaffold).
+- `scripts/uninstall.sh`: full uninstall (remove launchd + optional local cleanup).
 - `scripts/install_launchagent.sh`: install/start macOS login auto-run via launchd.
 - `scripts/uninstall_launchagent.sh`: remove/stop the launchd auto-run job.
 - `scripts/pre-commit-block-config.sh`: optional git pre-commit guard to block `config.json`.
@@ -149,7 +150,13 @@ launchctl print "gui/$(id -u)/com.clipto.watcher" | sed -n '1,40p'
 Stop and remove:
 
 ```bash
-bash scripts/uninstall_launchagent.sh
+bash scripts/uninstall.sh
+```
+
+Remove launchd plus local artifacts:
+
+```bash
+bash scripts/uninstall.sh --remove-all
 ```
 
 Log files:
