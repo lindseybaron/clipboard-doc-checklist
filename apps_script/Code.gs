@@ -1,4 +1,5 @@
 const DOC_ID = '<REPLACE_WITH_DOC_ID>';
+const ALLOW_PLAIN_FALLBACK = false;
 
 const TAG_TO_SECTION = {
   todo: 'TODO',
@@ -45,15 +46,30 @@ function appendEntry(typeRaw, textRaw, who, sectionRaw) {
   var timestamp = formatNow_();
   var line = '- ' + timestamp + ' [' + whoSafe + ']: ' + text;
 
-  ensureHeadingExists_(sectionTitle);
   var insertionPoint = findHeadingInsertionPoint_(sectionTitle);
 
+  // If section is missing, create heading + first checklist item atomically.
+  if (!insertionPoint.found) {
+    var createResult = createSectionAndFirstChecklistItemWithDocsApi_(sectionTitle, line, insertionPoint);
+    if (createResult.ok) {
+      return;
+    }
+    if (!ALLOW_PLAIN_FALLBACK) {
+      throw new Error('Create section + checklist failed: ' + createResult.error);
+    }
+  }
+
   // Use Docs API checkbox bullets for true clickable checkboxes.
-  if (insertChecklistWithDocsApi_(line, insertionPoint)) {
+  var checklistResult = insertChecklistWithDocsApi_(line, insertionPoint);
+  if (checklistResult.ok) {
     return;
   }
 
-  // Fallback if Docs API is unavailable/misconfigured.
+  if (!ALLOW_PLAIN_FALLBACK) {
+    throw new Error('Checklist insert failed: ' + checklistResult.error);
+  }
+
+  // Optional fallback if Docs API is unavailable/misconfigured.
   var doc = DocumentApp.openById(DOC_ID);
   var body = doc.getBody();
   var loc = findOrCreateH1Section_(body, sectionTitle);
@@ -102,13 +118,6 @@ function findOrCreateH1Section_(body, sectionTitle) {
   };
 }
 
-function ensureHeadingExists_(sectionTitle) {
-  var doc = DocumentApp.openById(DOC_ID);
-  var body = doc.getBody();
-  findOrCreateH1Section_(body, sectionTitle);
-  doc.saveAndClose();
-}
-
 function findHeadingInsertionPoint_(sectionTitle) {
   var docJson = Docs.Documents.get(DOC_ID);
   var tabContext = getPrimaryTabContext_(docJson);
@@ -135,6 +144,7 @@ function findHeadingInsertionPoint_(sectionTitle) {
       // Use paragraph end index directly; clamping here can collapse text into heading
       // when the heading is near end-of-doc.
       return {
+        found: true,
         index: idx,
         tabId: tabContext.tabId,
         atDocEnd: idx >= docEnd,
@@ -143,6 +153,7 @@ function findHeadingInsertionPoint_(sectionTitle) {
   }
 
   return {
+    found: false,
     index: docEnd,
     tabId: tabContext.tabId,
     atDocEnd: true,
@@ -188,9 +199,11 @@ function insertChecklistWithDocsApi_(line, insertionPoint) {
       },
       DOC_ID
     );
-    return true;
+    return { ok: true, error: '' };
   } catch (err) {
-    return false;
+    var message = err && err.message ? err.message : String(err);
+    Logger.log('Checklist insert failed: ' + message);
+    return { ok: false, error: message };
   }
 }
 
@@ -235,6 +248,66 @@ function getPrimaryTabContext_(docJson) {
     tabId: null,
     content: (docJson && docJson.body && docJson.body.content) || [],
   };
+}
+
+function createSectionAndFirstChecklistItemWithDocsApi_(sectionTitle, line, insertionPoint) {
+  try {
+    var start = Number(insertionPoint && insertionPoint.index);
+    if (!isFinite(start) || start < 1) {
+      start = 1;
+    }
+    var tabId = insertionPoint && insertionPoint.tabId;
+
+    // Create a new heading paragraph, then first checklist item beneath it.
+    var textToInsert = '\n' + sectionTitle + '\n' + line + '\n';
+    var headingStart = start + 1;
+    var headingEnd = headingStart + sectionTitle.length;
+    var bulletStart = headingEnd + 1;
+    var bulletEnd = bulletStart + line.length + 1;
+
+    var insertLocation = { index: start };
+    var headingRange = { startIndex: headingStart, endIndex: headingEnd };
+    var bulletRange = { startIndex: bulletStart, endIndex: bulletEnd };
+    if (tabId) {
+      insertLocation.tabId = tabId;
+      headingRange.tabId = tabId;
+      bulletRange.tabId = tabId;
+    }
+
+    Docs.Documents.batchUpdate(
+      {
+        requests: [
+          {
+            insertText: {
+              location: insertLocation,
+              text: textToInsert,
+            },
+          },
+          {
+            updateParagraphStyle: {
+              range: headingRange,
+              paragraphStyle: {
+                namedStyleType: 'HEADING_1',
+              },
+              fields: 'namedStyleType',
+            },
+          },
+          {
+            createParagraphBullets: {
+              range: bulletRange,
+              bulletPreset: 'BULLET_CHECKBOX',
+            },
+          },
+        ],
+      },
+      DOC_ID
+    );
+    return { ok: true, error: '' };
+  } catch (err) {
+    var message = err && err.message ? err.message : String(err);
+    Logger.log('Create section + checklist failed: ' + message);
+    return { ok: false, error: message };
+  }
 }
 
 function formatNow_() {
