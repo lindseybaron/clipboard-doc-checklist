@@ -235,6 +235,11 @@ Expected item text format:
 
 MIT. See `LICENSE`.
 
+## Project docs
+
+- Contribution guide: `CONTRIBUTING.md`
+- Changelog: `CHANGELOG.md`
+
 ## Publish to GitHub
 
 ### Public-release safety checklist
