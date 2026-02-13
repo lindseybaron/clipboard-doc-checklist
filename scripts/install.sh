@@ -5,6 +5,21 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BOOTSTRAP_SCRIPT="$ROOT_DIR/scripts/bootstrap.sh"
 LAUNCHD_SCRIPT="$ROOT_DIR/scripts/install_launchagent.sh"
 CONFIG_FILE="$ROOT_DIR/config.json"
+PREPARE_HEADINGS_SCRIPT="$ROOT_DIR/tools/prepare_doc_headings.py"
+PREPARE_HEADINGS=false
+
+for arg in "$@"; do
+  case "$arg" in
+    --prepare-headings)
+      PREPARE_HEADINGS=true
+      ;;
+    *)
+      echo "[error] unknown argument: $arg"
+      echo "Usage: bash scripts/install.sh [--prepare-headings]"
+      exit 1
+      ;;
+  esac
+done
 
 echo "[install] starting setup in $ROOT_DIR"
 
@@ -58,6 +73,11 @@ if warnings:
     for w in warnings:
         print(f" - {w}")
 PY
+
+if [[ "$PREPARE_HEADINGS" == "true" ]]; then
+  echo "[install] preparing document headings from config tag_map"
+  python3 "$PREPARE_HEADINGS_SCRIPT"
+fi
 
 if [[ -t 0 ]]; then
   read -r -p "Install auto-start at login via launchd? [y/N] " REPLY
