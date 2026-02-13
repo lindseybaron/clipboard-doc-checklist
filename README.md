@@ -27,6 +27,19 @@ Case-insensitive tags map to the exact Doc section headings as defined in `confi
 
 ## Setup (under 10 minutes)
 
+### Prerequisites
+
+- macOS or Linux shell environment with `bash`
+- `python3` available on `PATH` (recommended: Python 3.9+)
+- internet access to install dependencies from `requirements.txt`
+- a Google account to deploy the Apps Script Web App
+
+Check your Python version before install:
+
+```bash
+python3 --version
+```
+
 ### Quick start (recommended)
 
 From the repo root:
@@ -113,10 +126,10 @@ Example:
 ### 4) Install and run
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python tools/todo_it_clipboard.py
+python3 tools/todo_it_clipboard.py
 ```
 
 ### 5) Optional: run automatically at login (macOS launchd)
@@ -149,13 +162,13 @@ Log files:
 Validate local config only:
 
 ```bash
-python tools/healthcheck.py
+python3 tools/healthcheck.py
 ```
 
 Validate config and send an end-to-end probe item:
 
 ```bash
-python tools/healthcheck.py --write-test
+python3 tools/healthcheck.py --write-test
 ```
 
 ### 7) Pre-format doc headings from config
@@ -163,7 +176,7 @@ python tools/healthcheck.py --write-test
 Create any missing H1 headings based on `config.json` `tag_map` values:
 
 ```bash
-python tools/prepare_doc_headings.py
+python3 tools/prepare_doc_headings.py
 ```
 
 This command is safe to rerun; existing headings are not duplicated.
