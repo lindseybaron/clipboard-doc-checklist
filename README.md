@@ -7,6 +7,7 @@ Small automation project for capturing clipboard lines like `todo: ...` or `a2: 
 - `apps_script/Code.gs`: Google Apps Script Web App (`doPost`) that writes to your Google Doc.
 - `tools/todo_it_clipboard.py`: Python clipboard watcher that POSTs matching lines.
 - `config.example.json`: user-specific config template.
+- `scripts/bootstrap.sh`: one-command local setup (venv + deps + config scaffold).
 
 ## Prefix routing
 
@@ -20,6 +21,21 @@ Case-insensitive tags map to these exact Doc section headings:
 - `misc:` -> `Miscellany`
 
 ## Setup (under 10 minutes)
+
+### Quick start (recommended)
+
+From the repo root:
+
+```bash
+bash scripts/bootstrap.sh
+```
+
+Then edit `config.json` and run:
+
+```bash
+source .venv/bin/activate
+python tools/todo_it_clipboard.py
+```
 
 ### 1) Prepare your Google Doc
 
@@ -109,6 +125,10 @@ Expected item text format:
 - Text is sent over HTTPS POST to your Apps Script endpoint.
 - Clipboard content is not put into URL query strings.
 - Anyone with your `/exec` URL may be able to POST; prefer domain-restricted deployment when possible.
+
+## License
+
+MIT. See `LICENSE`.
 
 ## Publish to GitHub
 
