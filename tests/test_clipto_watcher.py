@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.todo_it_clipboard import load_config, parse_clipboard_text
+from tools.clipto_watcher import load_config, parse_clipboard_text
 
 
 class ParseClipboardTextTests(unittest.TestCase):

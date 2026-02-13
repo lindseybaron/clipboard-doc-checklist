@@ -5,7 +5,7 @@ Small automation project for capturing clipboard lines like `todo: ...` or `next
 ## What this includes
 
 - `apps_script/Code.gs`: Google Apps Script Web App (`doPost`) that writes to your Google Doc.
-- `tools/todo_it_clipboard.py`: Python clipboard watcher that POSTs matching lines.
+- `tools/clipto_watcher.py`: Python clipboard watcher that POSTs matching lines.
 - `tools/healthcheck.py`: validates config and can send an end-to-end probe item.
 - `tools/prepare_doc_headings.py`: creates missing H1 headings from `config.json` `tag_map`.
 - `config.example.json`: user-specific config template.
@@ -61,7 +61,7 @@ Then run manually (if you skipped launchd):
 
 ```bash
 source .venv/bin/activate
-python tools/todo_it_clipboard.py
+python tools/clipto_watcher.py
 ```
 
 Or include heading pre-format during install:
@@ -75,7 +75,7 @@ Check command usage/version:
 ```bash
 bash scripts/install.sh --help
 bash scripts/install.sh --version
-python3 tools/todo_it_clipboard.py --version
+python3 tools/clipto_watcher.py --version
 python3 tools/healthcheck.py --version
 python3 tools/prepare_doc_headings.py --version
 ```
@@ -140,7 +140,7 @@ Example:
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python3 tools/todo_it_clipboard.py
+python3 tools/clipto_watcher.py
 ```
 
 ### 5) Optional: run automatically at login (macOS launchd)

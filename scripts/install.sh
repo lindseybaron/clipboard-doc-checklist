@@ -137,5 +137,5 @@ cat <<'EOF'
 
 Run manually anytime:
   source .venv/bin/activate
-  python tools/todo_it_clipboard.py
+  python tools/clipto_watcher.py
 EOF

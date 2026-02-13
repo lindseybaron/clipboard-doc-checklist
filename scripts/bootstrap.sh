@@ -51,5 +51,5 @@ Next steps:
 1) Edit config.json with your web_app_url and other values.
 2) Run the watcher:
    source .venv/bin/activate
-   python tools/todo_it_clipboard.py
+   python tools/clipto_watcher.py
 EOF
