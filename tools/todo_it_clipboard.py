@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import sys
@@ -15,6 +16,7 @@ from typing import Any
 import pyperclip
 
 
+VERSION = "0.1.0"
 DEFAULT_TAG_MAP = {
     "todo": "TODO",
     "next": "Next Actions",
@@ -24,6 +26,24 @@ DEFAULT_TAG_MAP = {
 
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[1] / "config.json"
 PREFIX_RE = re.compile(r"^([A-Za-z0-9]+):(.*)$")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Watch clipboard text and post tagged lines to the Clipto web app."
+    )
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=DEFAULT_CONFIG_PATH,
+        help="Path to config JSON file (default: %(default)s).",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {VERSION}",
+    )
+    return parser.parse_args()
 
 
 def load_config(config_path: Path) -> dict[str, Any]:
@@ -131,8 +151,10 @@ def post_payload(web_app_url: str, payload: dict[str, str]) -> bool:
 
 
 def main() -> int:
+    args = parse_args()
+
     try:
-        config = load_config(DEFAULT_CONFIG_PATH)
+        config = load_config(args.config)
     except Exception as exc:  # noqa: BLE001
         print(f"[fatal] {exc}")
         return 1

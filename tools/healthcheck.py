@@ -12,6 +12,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 
+VERSION = "0.1.0"
 ROOT_DIR = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT_DIR / "config.json"
 
@@ -97,15 +98,26 @@ def post_probe(url: str, payload: dict[str, str]) -> tuple[bool, str]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate setup and optionally send a probe entry.")
     parser.add_argument(
+        "--config",
+        type=Path,
+        default=CONFIG_PATH,
+        help="Path to config JSON file (default: %(default)s).",
+    )
+    parser.add_argument(
         "--write-test",
         action="store_true",
         help="Send a probe entry to the Google Doc to verify end-to-end posting.",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {VERSION}",
     )
     args = parser.parse_args()
 
     print("[healthcheck] loading config...")
     try:
-        cfg = load_config(CONFIG_PATH)
+        cfg = load_config(args.config)
     except Exception as exc:  # noqa: BLE001
         print(f"[fail] {exc}")
         return 1
