@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 import urllib.error
@@ -12,6 +13,25 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT_DIR / "config.json"
+VERSION = "0.1.0"
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Create missing H1 headings in the Google Doc from config tag_map."
+    )
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=CONFIG_PATH,
+        help="Path to config JSON file (default: %(default)s).",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {VERSION}",
+    )
+    return parser.parse_args()
 
 
 def load_config(path: Path) -> dict:
@@ -74,8 +94,9 @@ def ensure_headings(web_app_url: str, sections: list[str]) -> tuple[bool, str]:
 
 
 def main() -> int:
+    args = parse_args()
     try:
-        cfg = load_config(CONFIG_PATH)
+        cfg = load_config(args.config)
         web_app_url = str(cfg.get("web_app_url", "")).strip()
         if not web_app_url:
             raise ValueError("web_app_url is missing in config.json")

@@ -70,6 +70,16 @@ Or include heading pre-format during install:
 bash scripts/install.sh --prepare-headings
 ```
 
+Check command usage/version:
+
+```bash
+bash scripts/install.sh --help
+bash scripts/install.sh --version
+python3 tools/todo_it_clipboard.py --version
+python3 tools/healthcheck.py --version
+python3 tools/prepare_doc_headings.py --version
+```
+
 ### 1) Prepare your Google Doc
 
 Create a Google Doc. You can pre-create headings from your `config.json` `tag_map` values as **Heading 1**, but this is optional.

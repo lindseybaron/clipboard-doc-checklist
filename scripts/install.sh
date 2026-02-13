@@ -6,16 +6,36 @@ BOOTSTRAP_SCRIPT="$ROOT_DIR/scripts/bootstrap.sh"
 LAUNCHD_SCRIPT="$ROOT_DIR/scripts/install_launchagent.sh"
 CONFIG_FILE="$ROOT_DIR/config.json"
 PREPARE_HEADINGS_SCRIPT="$ROOT_DIR/tools/prepare_doc_headings.py"
+VERSION="0.1.0"
 PREPARE_HEADINGS=false
+
+print_usage() {
+  cat <<'EOF'
+Usage: bash scripts/install.sh [--prepare-headings] [--help] [--version]
+
+Options:
+  --prepare-headings   Create missing Google Doc H1 sections from config tag_map.
+  --help               Show this help text and exit.
+  --version            Print install script version and exit.
+EOF
+}
 
 for arg in "$@"; do
   case "$arg" in
     --prepare-headings)
       PREPARE_HEADINGS=true
       ;;
+    --help|-h)
+      print_usage
+      exit 0
+      ;;
+    --version)
+      echo "clipto-install $VERSION"
+      exit 0
+      ;;
     *)
       echo "[error] unknown argument: $arg"
-      echo "Usage: bash scripts/install.sh [--prepare-headings]"
+      print_usage
       exit 1
       ;;
   esac
